@@ -14,8 +14,8 @@ public class Scheduler {
         Collections.sort(tasks, new Comparator<Task>() {
             @Override
             public int compare(Task rhs, Task lhs) {
-                // -1 - less than, 1 - greater than, 0 - equal, all inversed for descending
-                return lhs.start > rhs.start ? -1 : (lhs.start < rhs.start) ? 1 : 0;
+                //return lhs.start > rhs.start ? -1 : (lhs.start < rhs.start) ? 1 : 0;
+                return Integer.compare(rhs.start, lhs.start);
             }
         });
 
@@ -34,18 +34,34 @@ public class Scheduler {
 
         //kezdes ideje
         int kezdes=100;
-        for(int i=0; i<db; i++){
-            if(kezdes>tasks.get(i).start){
-                kezdes=tasks.get(i).start;
-            }
-        }
-        for(int i=0; i<db; i++){
-            tasks.get(i).start=tasks.get(i).start-kezdes;
-        }
+//        for(int i=0; i<db; i++){
+//            if(kezdes>tasks.get(i).start){
+//                kezdes=tasks.get(i).start;
+//            }
+//        }
+//        for(int i=0; i<db; i++){
+//            tasks.get(i).start=tasks.get(i).start-kezdes;
+//        }
 
 
         //utemezes kezdese
         for (int u =0; u < utem; u++) {
+
+            kezdes=100;
+            for(int i=0; i<db; i++){
+                if(kezdes>tasks.get(i).start-ido){
+                    if(tasks.get(i).start-ido>=0){
+                        kezdes=tasks.get(i).start-ido;
+                    }
+                }
+            }
+           // System.out.println("kezdes: "+kezdes);
+            for(int i=0; i<db; i++){
+                    tasks.get(i).start=tasks.get(i).start-kezdes;
+            }
+
+
+
 
             if(tasks.get(futo).prio==1 && tasks.get(futo).burst==0){
                 futprio=false;
@@ -63,18 +79,11 @@ public class Scheduler {
             //if(futprio){
             for(int i=0; i<db; i++){
                 //tasks.get(i).print();
-                //System.out.println(tasks.get(i).hanyszorfutott);
+               // System.out.println(futo);
                 if(tasks.get(i).start==ido && tasks.get(i).prio==1 && tasks.get(futo).prio==0 && tasks.get(i).burst!=0){
                     futo=i;
                     futprio=true;
                 }
-
-
-//                if(tasks.get(i).start==ido && tasks.get(i).prio==1 && tasks.get(futo).prio==0 && tasks.get(i).burst!=0){
-//                    futo=i;
-//                    futprio=true;
-//                }
-
 
 
                 if(tasks.get(i).start==ido && tasks.get(futo).hanyszorfutott==2 && i!=futo &&  tasks.get(i).prio==1 ){
@@ -94,6 +103,7 @@ public class Scheduler {
             if(!futprio){
                 //System.out.println(futo);
                 for(int i=0; i<db; i++){
+                   // tasks.get(i).print();
                     if(tasks.get(i).start==ido && tasks.get(futo).burst==0 && tasks.get(i).prio==0){
                         futo=i;
                     }
@@ -113,12 +123,17 @@ public class Scheduler {
             tasks.get(futo).hanyszorfutott++;
             if(list.isEmpty()){
                 list+=tasks.get(futo).name;
+                //System.out.println(tasks.get(futo).name+"if");
             }
             else{
+                //System.out.println(tasks.get(futo).name+"else");
                 if(list.charAt(list.length()-1)!=tasks.get(futo).name.charAt(tasks.get(futo).name.length() - 1)){
                     list+=tasks.get(futo).name;
                 }
             }
+
+
+
             for(int i=0; i<db; i++){
                 if(tasks.get(i).start<ido && tasks.get(i).burst!=0){
                     tasks.get(i).start=ido;
@@ -130,11 +145,13 @@ public class Scheduler {
                     tasks.get(i).hanyszorfutott=0;
                 }
             }
+
+
         }
 
 
+        //kiiratas
         System.out.println(list);
-
 
         for (int i = 0; i < db; i++) {
             System.out.print(tasks.get(i).name + ":");
