@@ -3,7 +3,7 @@ import java.util.ArrayList;
 public class Scheduler {
 
     public int[] wait=new int[10];
-    public String list;
+    public String list="";
     public String[] name=new String[10] ;
     public void order(ArrayList<Task> tasks, int db){
         int futo=0;
@@ -20,30 +20,35 @@ public class Scheduler {
 
         //utemezes kezdese
         for(int u=0; u<utem; u++) {
-
+            //RR
             //osszehasonlitas a tobbivel
             for(int i=0; i<db; i++){
                 tasks.get(i).print();
-                if(tasks.get(futo).burst==0 && tasks.get(i).start==ido){
+                if( tasks.get(i).start==ido && tasks.get(futo).burst==0){
                     futo=i;
                 }
                 if(tasks.get(i).start == ido && tasks.get(futo).prio<tasks.get(i).prio){
                     futo=i;
                 }
-                if(tasks.get(i).start == ido && tasks.get(futo).prio==tasks.get(i).prio && tasks.get(futo).name.compareTo(tasks.get(i).name)>0){
+                if(tasks.get(i).start == ido /*&& tasks.get(futo).prio==tasks.get(i).prio*/ && tasks.get(futo).name.compareTo(tasks.get(i).name)>0){
                     futo=i;
                 }
-            }
+                if(tasks.get(i).start == ido /* && tasks.get(futo).prio==tasks.get(i).prio*/ && tasks.get(i).burst<tasks.get(futo).burst){
+                    futo=i;
+                }
 
+            }
             //lepes
             ido++;
             tasks.get(futo).burst--;
-            tasks.get(futo).start=ido;
-            list = new StringBuilder(tasks.get(futo).name).append(list).toString();
+
+            list+=tasks.get(futo).name;
             for(int i=0; i<db; i++){
-                if(i!=futo && tasks.get(i).start<ido && tasks.get(i).burst!=0){
-                    wait[i]++;
-                    tasks.get(i).start++;
+                if(tasks.get(i).start<ido && tasks.get(i).burst!=0){
+                    tasks.get(i).start=ido;
+                    if(i!=futo){
+                        wait[i]++;
+                    }
                 }
             }
         }
