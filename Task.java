@@ -7,7 +7,11 @@ public class Task {
     public int start;
     public int burst;
 
+    public int wait;
+
     public int hanyszorfutott;
+
+
 
     public Task(String n, String p, String s, String b) {
         name = n;
@@ -15,6 +19,10 @@ public class Task {
         start = Integer.parseInt(s);
         burst = Integer.parseInt(b);
         hanyszorfutott=0;
+    }
+
+    public int compareTo(Task t){
+        return Integer.compare(start, t.start);
     }
 
     public void print() {

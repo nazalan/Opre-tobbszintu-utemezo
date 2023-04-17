@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class Scheduler {
 
@@ -6,7 +8,17 @@ public class Scheduler {
     public String list = "";
     public String[] name = new String[10];
 
+
+
     public void order(ArrayList<Task> tasks, int db) {
+        Collections.sort(tasks, new Comparator<Task>() {
+            @Override
+            public int compare(Task rhs, Task lhs) {
+                // -1 - less than, 1 - greater than, 0 - equal, all inversed for descending
+                return lhs.start > rhs.start ? -1 : (lhs.start < rhs.start) ? 1 : 0;
+            }
+        });
+
         int futo = 0;
         int ido = 0;
         boolean futprio=true;
@@ -19,11 +31,22 @@ public class Scheduler {
         for (int i = 0; i < db; i++) {
             utem += tasks.get(i).burst;
         }
-        //futo=11;
+
+        //kezdes ideje
+        int kezdes=100;
+        for(int i=0; i<db; i++){
+            if(kezdes>tasks.get(i).start){
+                kezdes=tasks.get(i).start;
+            }
+        }
+        for(int i=0; i<db; i++){
+            tasks.get(i).start=tasks.get(i).start-kezdes;
+        }
+
+
         //utemezes kezdese
+        for (int u =0; u < utem; u++) {
 
-
-        for (int u = 0; u < utem; u++) {
             if(tasks.get(futo).prio==1 && tasks.get(futo).burst==0){
                 futprio=false;
             }
@@ -39,33 +62,38 @@ public class Scheduler {
             //RR
             //if(futprio){
             for(int i=0; i<db; i++){
-                tasks.get(i).print();
-                System.out.println("RR");
-                if(tasks.get(i).prio==1 && tasks.get(futo).prio==0 && tasks.get(i).burst!=0){
+                //tasks.get(i).print();
+                //System.out.println(tasks.get(i).hanyszorfutott);
+                if(tasks.get(i).start==ido && tasks.get(i).prio==1 && tasks.get(futo).prio==0 && tasks.get(i).burst!=0){
                     futo=i;
                     futprio=true;
                 }
-                if(tasks.get(futo).hanyszorfutott==2 && i!=futo &&  tasks.get(i).prio==1 ){
+
+
+//                if(tasks.get(i).start==ido && tasks.get(i).prio==1 && tasks.get(futo).prio==0 && tasks.get(i).burst!=0){
+//                    futo=i;
+//                    futprio=true;
+//                }
+
+
+
+                if(tasks.get(i).start==ido && tasks.get(futo).hanyszorfutott==2 && i!=futo &&  tasks.get(i).prio==1 ){
                     futo=i;
                     futprio=true;
                 }
-                if(tasks.get(i).start==ido && tasks.get(futo).burst==0 && tasks.get(i).hanyszorfutott!=2 && tasks.get(i).prio==1){
+                if(tasks.get(i).start==ido && tasks.get(i).start==ido && tasks.get(futo).burst==0 && tasks.get(i).hanyszorfutott!=2 && tasks.get(i).prio==1){
                     futo=i;
                     futprio=true;
                 }
             }
-            System.out.println(futo);
+            //System.out.println(futo);
             //}
 
             //SRTF
             //osszehasonlitas a tobbivel
             if(!futprio){
-                System.out.println(futo);
+                //System.out.println(futo);
                 for(int i=0; i<db; i++){
-                    tasks.get(i).print();
-                    if(tasks.get(i).start==ido && tasks.get(i).prio==0){
-                        futo=i;
-                    }
                     if(tasks.get(i).start==ido && tasks.get(futo).burst==0 && tasks.get(i).prio==0){
                         futo=i;
                     }
@@ -77,36 +105,45 @@ public class Scheduler {
                     }
                 }
             }
+            //System.out.println("\n");
 
             //lepes
             ido++;
-            if(futo!=11){
-                tasks.get(futo).burst--;
-                tasks.get(futo).hanyszorfutott++;
-                if(list.isEmpty()){
+            tasks.get(futo).burst--;
+            tasks.get(futo).hanyszorfutott++;
+            if(list.isEmpty()){
+                list+=tasks.get(futo).name;
+            }
+            else{
+                if(list.charAt(list.length()-1)!=tasks.get(futo).name.charAt(tasks.get(futo).name.length() - 1)){
                     list+=tasks.get(futo).name;
                 }
-                else{
-                    if(list.charAt(list.length()-1)!=tasks.get(futo).name.charAt(tasks.get(futo).name.length() - 1)){
-                        list+=tasks.get(futo).name;
-                    }
-                }
-                for(int i=0; i<db; i++){
-                    if(tasks.get(i).start<ido && tasks.get(i).burst!=0){
-                        tasks.get(i).start=ido;
-                        if(i!=futo){
-                            wait[i]++;
-                        }
-                    }
-                    if(i!=futo){
-                        tasks.get(i).hanyszorfutott=0;
-                    }
-                }
             }
-            if(futo==11){
-                u--;
+            for(int i=0; i<db; i++){
+                if(tasks.get(i).start<ido && tasks.get(i).burst!=0){
+                    tasks.get(i).start=ido;
+                    if(i!=futo){
+                        tasks.get(i).wait++;
+                    }
+                }
+                if(i!=futo){
+                    tasks.get(i).hanyszorfutott=0;
+                }
             }
         }
+
+
+        System.out.println(list);
+
+
+        for (int i = 0; i < db; i++) {
+            System.out.print(tasks.get(i).name + ":");
+            System.out.print(tasks.get(i).wait);
+            if (i < db - 1) {
+                System.out.print(",");
+            }
+        }
+
     }
 
 

@@ -26,13 +26,13 @@ public class Main {
         sch.order(tasks, db);
 
 
-        System.out.println(sch.list);
-        for (int i = 0; i < db; i++) {
-            System.out.print(sch.name[i] + ":");
-            System.out.print(sch.wait[i]);
-            if (i < db - 1) {
-                System.out.print(",");
-            }
-        }
+//        System.out.println(sch.list);
+//        for (int i = 0; i < db; i++) {
+//            System.out.print(sch.name[i] + ":");
+//            System.out.print(sch.wait[i]);
+//            if (i < db - 1) {
+//                System.out.print(",");
+//            }
+//        }
     }
 }
